@@ -1,5 +1,10 @@
 # Pearl Fleet Operations Manager
 
+<p align="center">
+  <img src="./assets-github/titlebar-main.svg" width="750" /><br>
+  <img src="./assets/main.png" width="750" />
+</p>
+
 A comprehensive Python-based automation and monitoring suite designed to deploy, manage, and optimize high-performance GPU instances across cloud providers (Vast.ai, DigitalOcean) for continuous workloads (e.g., hashcat, computational tasks, machine learning). 
 
 The system implements fully autonomous fleet scaling, real-time profitability tracking, and robust recovery mechanisms with minimal manual intervention.
@@ -11,6 +16,18 @@ The system implements fully autonomous fleet scaling, real-time profitability tr
 - **DigitalOcean Integration (`digitalocean/do_gpu_sniper.py`)**: Dedicated droplet provisioner bypassing web UI bottlenecks to spin up H100/A100 instances globally based on immediate API availability.
 - **TUI Dashboard (`core/fleet-live.py`)**: Terminal User Interface built with custom rendering logic to display live metrics, total fleet cost, combined computational power, and active server counts in a unified view.
 - **Telegram Reporting (`scripts/tg_price_bot.py`)**: Automated market and operations tracking pushing updates directly to designated Telegram channels.
+
+## Interface Showcase
+
+<p align="center">
+  <img src="./assets-github/titlebar-market.svg" width="750" /><br>
+  <img src="./assets/market.png" width="750" />
+</p>
+<br>
+<p align="center">
+  <img src="./assets-github/titlebar-autobuy.svg" width="750" /><br>
+  <img src="./assets/autobuy.png" width="750" />
+</p>
 
 ## Project Architecture
 
