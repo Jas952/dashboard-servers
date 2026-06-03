@@ -4,7 +4,7 @@
 
 WALLET="YOUR_WALLET_ADDRESS"
 POOL="us2.alphapool.tech:5566"
-MINER_URL="https://github.com/AlphaMine-Tech/alpha-miner/releases/download/v1.7.6-beta/alpha-V1.7.6.20260530.tar.gz"
+MINER_URL="https://github.com/AlphaMine-Tech/compute-agent/releases/download/v1.7.6-beta/alpha-V1.7.6.20260530.tar.gz"
 
 # Already updated (4 test servers): 38453923 38450441 38585668 38628869
 
@@ -25,7 +25,7 @@ for i in data:
         gpu=i.get('gpu_name','?')
         n=i.get('num_gpus',1)
         if host and port:
-            cmd=f\"ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no -n -T root@{host} -p {port} 'pkill -9 alpha-miner 2>/dev/null; sleep 1; cd /tmp && curl -fsSL {MINER_URL} -o alpha-new.tar.gz && tar -xzf alpha-new.tar.gz && cp alpha-miner /usr/bin/alpha-miner && chmod +x /usr/bin/alpha-miner && nohup /usr/bin/alpha-miner --pool {POOL} --wallet {WALLET} --worker vast-{iid} --password x\\;d=262144 > /var/log/alpha-miner.log 2>&1 &'\"
+            cmd=f\"ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no -n -T root@{host} -p {port} 'pkill -9 compute-agent 2>/dev/null; sleep 1; cd /tmp && curl -fsSL {MINER_URL} -o alpha-new.tar.gz && tar -xzf alpha-new.tar.gz && cp compute-agent /usr/bin/compute-agent && chmod +x /usr/bin/compute-agent && nohup /usr/bin/compute-agent --pool {POOL} --wallet {WALLET} --worker vast-{iid} --password x\\;d=262144 > /var/log/compute-agent.log 2>&1 &'\"
             print(f'echo \"=== {iid} ({n}x {gpu}) ===\"')
             print(cmd)
             print(f\"echo '\u2705 {iid} done'\")

@@ -5,8 +5,18 @@
   <img src="./assets/main.png" width="750" />
 </p>
 
-A Python-based automation and monitoring package designed to deploy, manage, and optimize Vast's high-performance GPUs.
+A Python-based automation and monitoring package designed to deploy, manage, and optimize high-performance GPUs across cloud providers (Vast.ai, DigitalOcean).
 The system implements fully autonomous fleet scaling, real-time profitability tracking, and robust recovery mechanisms with minimal manual intervention.
+
+## Targeted Hardware
+The provisioner and watchdog are specifically calibrated to scan, rent, and monitor the following high-end NVIDIA GPUs:
+- **RTX 5090**
+- **RTX 5080**
+- **RTX 4090**
+- **RTX 4080**
+- **RTX 3090**
+- **RTX 3080 Ti**
+- **RTX 3080**
 
 ## Core Features
 
@@ -27,6 +37,16 @@ The system implements fully autonomous fleet scaling, real-time profitability tr
   <img src="./assets-github/titlebar-autobuy.svg" width="750" /><br>
   <img src="./assets/autobuy.png" width="750" />
 </p>
+
+## Example Use Case: Project Pearl
+This dashboard and provisioning suite was originally developed to orchestrate the **Pearl Fleet**, a decentralized GPU computing cluster. The system was designed to continuously hunt for the cheapest available compute power globally, rent the servers, deploy a proprietary payload (`compute-agent`), and monitor the performance in real-time.
+
+### Dashboard Metrics Explained
+The TUI dashboard tracks several critical data points to ensure the fleet remains profitable:
+- **Hashrate (Compute Rate):** The raw performance output of the GPU (measured in TH/s or MH/s depending on the workload).
+- **DPH ($/hr):** Dollars Per Hour. The actual rental cost of the specific instance.
+- **$/100TH (Efficiency Index):** The most important metric in the dashboard. It calculates the dollar cost to achieve a normalized amount of compute power (100 Terahashes). The watchdog uses this metric to aggressively cull instances that are underperforming or too expensive for their output, ensuring strict fleet margin control.
+- **Status:** Real-time lifecycle state (e.g., `LOADING`, `COMPUTING`, `OFFLINE`).
 
 ## Project Architecture
 

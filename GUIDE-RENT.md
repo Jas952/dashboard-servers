@@ -119,7 +119,7 @@ $/100TH = (цена $/час на Vast) ÷ (ожидаемый хешрейт в
 | Где | Что смотреть |
 |-----|----------------|
 | **Пул** | LIVE hashrate, воркер `vast-<instance_id>-...` |
-| **SSH** (если доступен) | `/var/log/alpha-miner.log`, строки `hashrate_th_s=` |
+| **SSH** (если доступен) | `/var/log/compute-agent.log`, строки `hashrate_th_s=` |
 | **Vast** | статус `running`, в логе нет `CDI`, `failed to create task`, `invalid runtime nvidia` |
 
 **Ориентиры LIVE (не в первые 2–3 минуты):**

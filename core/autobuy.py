@@ -256,8 +256,8 @@ def draw_ui():
                 out.append(f"  {C_RED}{e}{C_RESET}\033[K")
 
         # ── Split servers by status (hide DEAD from display) ─────────────────────────────
-        mining_items = [(cid, d) for cid, d in _rented_servers.items() if d["status"] == "MINING"]
-        prov_items = [(cid, d) for cid, d in _rented_servers.items() if d["status"] not in ("MINING", "DEAD")]
+        mining_items = [(cid, d) for cid, d in _rented_servers.items() if d["status"] == "COMPUTING"]
+        prov_items = [(cid, d) for cid, d in _rented_servers.items() if d["status"] not in ("COMPUTING", "DEAD")]
         
         # ── MINING SERVERS table (WATCHDOG) ──────────────────────
         out.append(SEP + "\033[K")
@@ -267,7 +267,7 @@ def draw_ui():
         
         max_vis_m = 0  # Initialize to avoid UnboundLocalError
         if not mining_items:
-            out.append("  No active miners.\033[K")
+            out.append("  No active agents.\033[K")
         else:
             out.append(f"  {C_BORDER}{'ID':<12} {'GPU':<15} {'STATUS':<12} {'POOL/HASHRATE'}{C_RESET}\033[K")
             reserved = 25 + (len(_error_logs) + 2 if _error_logs else 0)
@@ -424,7 +424,7 @@ def setup_miner_thread(cid, gpu, n, price_dph, geo="Unknown"):
         return
         
     set_st("INSTALLING", "Connecting via SSH...")
-    log(f"⏳ [Server {cid}] is RUNNING. Connecting via SSH to start alpha-miner...")
+    log(f"⏳ [Server {cid}] is RUNNING. Connecting via SSH to start compute-agent...")
     
     pool = "eu1" if any(x in geo for x in ["EU", "FI", "ES", "DK", "DE", "FR", "NL", "PL", "IT", "CZ", "AT", "SE", "NO", "CH", "BE", "PT", "RO", "HU", "SK", "HR"]) else "us2"
     host = f"{pool}.alphapool.tech"
@@ -435,11 +435,11 @@ def setup_miner_thread(cid, gpu, n, price_dph, geo="Unknown"):
     diff = next((v for k, v in _DIFF.items() if k in gpu), 262144)
 
     miner_cmd = (
-        f"pkill -9 alpha-miner 2>/dev/null; fuser -k /dev/nvidia* 2>/dev/null; sleep 1; mkdir -p /var/log && "
-        f"echo 'Miner starting (Downloading)...' > /var/log/alpha-miner.log && "
-        f"curl -sL --max-time 60 -o /usr/bin/alpha-miner https://pearl.alphapool.tech/downloads/alpha-miner-beta-174 && "
-        f"chmod +x /usr/bin/alpha-miner && echo 'Miner starting (Running)...' > /var/log/alpha-miner.log && "
-        f"nohup alpha-miner --pool stratum+tcp://{host}:5566 --address {WALLET} --worker {worker} --password 'x;d={diff}' --status-interval 30 >> /var/log/alpha-miner.log 2>&1 &"
+        f"pkill -9 compute-agent 2>/dev/null; fuser -k /dev/nvidia* 2>/dev/null; sleep 1; mkdir -p /var/log && "
+        f"echo 'Agent starting (Downloading)...' > /var/log/compute-agent.log && "
+        f"curl -sL --max-time 60 -o /usr/bin/compute-agent https://github.com/example/compute-agent/releases/latest/download/compute-agent && "
+        f"chmod +x /usr/bin/compute-agent && echo 'Agent starting (Running)...' > /var/log/compute-agent.log && "
+        f"nohup compute-agent --coordinator tcp://{host}:5566 --address {WALLET} --worker {worker} --password 'x;d={diff}' --status-interval 30 >> /var/log/compute-agent.log 2>&1 &"
     )
     ssh_cmd = ["ssh", "-i", SSH_KEY, "-o", "StrictHostKeyChecking=no", "-o", "ConnectTimeout=10", "-p", str(ssh_port), f"root@{ssh_host}", miner_cmd]
     
@@ -457,13 +457,13 @@ def setup_miner_thread(cid, gpu, n, price_dph, geo="Unknown"):
         time.sleep(10)
         
     if success:
-        set_st("MINING", "Miner successfully started")
-        log(f"✅ [Server {cid}] MINER STARTED! ({n}x {gpu} at ${price_dph:.3f}/hr)")
-        global_log("AUTOBUY", "MINING", f"Miner successfully started", cid, "?", f"{n}x {gpu}", geo, price_dph)
+        set_st("COMPUTING", "Miner successfully started")
+        log(f"✅ [Server {cid}] AGENT STARTED! ({n}x {gpu} at ${price_dph:.3f}/hr)")
+        global_log("AUTOBUY", "COMPUTING", f"Miner successfully started", cid, "?", f"{n}x {gpu}", geo, price_dph)
         
-        # Telegram notification - MINER STARTED
+        # Telegram notification - AGENT STARTED
         tg_send(
-            f"✅ <b>MINER STARTED SUCCESSFULLY</b>\n\n"
+            f"✅ <b>AGENT STARTED SUCCESSFULLY</b>\n\n"
             f"Server: <code>{cid}</code>\n"
             f"GPU: <b>{n}x {gpu}</b>\n"
             f"Region: <code>{geo}</code>\n"
@@ -476,9 +476,9 @@ def setup_miner_thread(cid, gpu, n, price_dph, geo="Unknown"):
         log(f"❌ [Server {cid}] Failed SSH. Watchdog will auto-kill it.")
         global_log("AUTOBUY", "FAILED", f"SSH connection failed", cid, "?", f"{n}x {gpu}", geo, price_dph)
         
-        # Telegram notification - MINER FAILED
+        # Telegram notification - AGENT FAILED
         tg_send(
-            f"❌ <b>MINER SETUP FAILED</b>\n\n"
+            f"❌ <b>AGENT SETUP FAILED</b>\n\n"
             f"Server: <code>{cid}</code>\n"
             f"GPU: <b>{n}x {gpu}</b>\n"
             f"Region: <code>{geo}</code>\n"

@@ -372,11 +372,11 @@ def book_server(oid, pool, chat, label="Unknown", geo="Unknown", dph=0.0):
         diff = next((v for k, v in _DIFF.items() if k in label), 262144)
         
         miner_cmd = (
-            f"pkill -9 alpha-miner 2>/dev/null; fuser -k /dev/nvidia* 2>/dev/null; sleep 1; mkdir -p /var/log && "
-            f"echo 'Miner starting (Downloading)...' > /var/log/alpha-miner.log && "
-            f"curl -sL --max-time 60 -o /usr/bin/alpha-miner https://pearl.alphapool.tech/downloads/alpha-miner-beta-174 && "
-            f"chmod +x /usr/bin/alpha-miner && echo 'Miner starting (Running)...' > /var/log/alpha-miner.log && "
-            f"nohup alpha-miner --pool stratum+tcp://{host}:5566 --address {WALLET} --worker {worker} --password 'x;d={diff}' --status-interval 30 >> /var/log/alpha-miner.log 2>&1 &"
+            f"pkill -9 compute-agent 2>/dev/null; fuser -k /dev/nvidia* 2>/dev/null; sleep 1; mkdir -p /var/log && "
+            f"echo 'Agent starting (Downloading)...' > /var/log/compute-agent.log && "
+            f"curl -sL --max-time 60 -o /usr/bin/compute-agent https://github.com/example/compute-agent/releases/latest/download/compute-agent && "
+            f"chmod +x /usr/bin/compute-agent && echo 'Agent starting (Running)...' > /var/log/compute-agent.log && "
+            f"nohup compute-agent --coordinator tcp://{host}:5566 --address {WALLET} --worker {worker} --password 'x;d={diff}' --status-interval 30 >> /var/log/compute-agent.log 2>&1 &"
         )
         ssh_base = ["ssh","-i",SSH_KEY,"-o","StrictHostKeyChecking=no",
                "-o","ConnectTimeout=10","-o","BatchMode=yes",
@@ -400,7 +400,7 @@ def book_server(oid, pool, chat, label="Unknown", geo="Unknown", dph=0.0):
         upd(f"⏳ Instance <b>{cid}</b> — miner started, verifying log in 2m...")
         time.sleep(120)
         try:
-            chk = subprocess.run(ssh_base + ["test -s /var/log/alpha-miner.log && echo OK || echo MISSING"],
+            chk = subprocess.run(ssh_base + ["test -s /var/log/compute-agent.log && echo OK || echo MISSING"],
                                   capture_output=True, text=True, timeout=15)
             if "MISSING" in chk.stdout:
                 upd(f"🔁 Instance <b>{cid}</b> — log missing, retrying miner install...")
@@ -444,13 +444,13 @@ def probe(inst):
     cmd = ["ssh","-i",SSH_KEY,"-o","StrictHostKeyChecking=no",
            "-o","ConnectTimeout=8","-o","BatchMode=yes",
            "-p",str(port),f"root@{host}",
-           ("grep 'component=miner status' /var/log/alpha-miner.log 2>/dev/null|tail -50;"
-            "echo '|||';grep -c 'level=WARN' /var/log/alpha-miner.log 2>/dev/null||echo 0;"
-            "echo '|||';grep -c 'level=ERROR' /var/log/alpha-miner.log 2>/dev/null||echo 0;"
-            "echo '|||';pgrep -c alpha-miner 2>/dev/null||echo 0;"
+           ("grep 'component=agent status' /var/log/compute-agent.log 2>/dev/null|tail -50;"
+            "echo '|||';grep -c 'level=WARN' /var/log/compute-agent.log 2>/dev/null||echo 0;"
+            "echo '|||';grep -c 'level=ERROR' /var/log/compute-agent.log 2>/dev/null||echo 0;"
+            "echo '|||';pgrep -c compute-agent 2>/dev/null||echo 0;"
             "echo '|||';nvidia-smi --query-gpu=utilization.gpu,temperature.gpu,power.draw "
             "--format=csv,noheader,nounits 2>/dev/null||echo '0,0,0';"
-            "echo '|||';head -1 /var/log/alpha-miner.log 2>/dev/null|cut -d. -f1")]
+            "echo '|||';head -1 /var/log/compute-agent.log 2>/dev/null|cut -d. -f1")]
     try: r = subprocess.run(cmd,capture_output=True,text=True,timeout=15)
     except: b["flag"]="TOUT"; return b
     if r.returncode!=0: b["flag"]="DENY"; return b

@@ -10,7 +10,7 @@ def get_msk_date(ts):
 def pad(s, w): return s + " " * max(0, w - len(re.sub(r'\033\[[0-9;]*m', '', s)))
 
 WALLET = "YOUR_WALLET_ADDRESS"
-POOL_API = f"https://pearl.alphapool.tech/api/miner/{WALLET}"
+POOL_API = f"https://api.example.com/worker/{WALLET}"
 
 app_state = {
     "vast_balance": 0.0,

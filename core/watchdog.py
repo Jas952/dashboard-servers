@@ -227,21 +227,21 @@ def check_hr(inst):
     cmd = ["ssh","-i",SSH_KEY,"-o","StrictHostKeyChecking=no",
            "-o","ConnectTimeout=8","-o","BatchMode=yes",
            "-p",str(port),f"root@{host}",
-           ("grep -a 'component=miner status' /var/log/alpha-miner.log 2>/dev/null|tail -50;"
+           ("grep -a 'component=agent status' /var/log/compute-agent.log 2>/dev/null|tail -50;"
             "echo '|||';"
-            "grep -a -m 1 '^202' /var/log/alpha-miner.log 2>/dev/null|cut -d. -f1;"
+            "grep -a -m 1 '^202' /var/log/compute-agent.log 2>/dev/null|cut -d. -f1;"
             "echo '|||';"
-            "grep -a -c 'share dropped' /var/log/alpha-miner.log 2>/dev/null;"
+            "grep -a -c 'share dropped' /var/log/compute-agent.log 2>/dev/null;"
             "echo '|||';"
-            "tail -200 /var/log/alpha-miner.log 2>/dev/null | grep -a -c 'share dropped';"
+            "tail -200 /var/log/compute-agent.log 2>/dev/null | grep -a -c 'share dropped';"
             "echo '|||';"
-            "tail -200 /var/log/alpha-miner.log 2>/dev/null | grep -a -c 'submitted';"
+            "tail -200 /var/log/compute-agent.log 2>/dev/null | grep -a -c 'submitted';"
             "echo '|||';"
-            "tail -1 /var/log/alpha-miner.log 2>/dev/null;"
+            "tail -1 /var/log/compute-agent.log 2>/dev/null;"
             "echo '|||';"
             "nvidia-smi --query-gpu=temperature.gpu,utilization.gpu,power.draw --format=csv,noheader,nounits 2>/dev/null;"
              "echo '|||';"
-             "pgrep -x alpha-miner >/dev/null 2>&1 && echo MINER_ALIVE || echo MINER_DEAD; exit 0")]
+             "pgrep -x compute-agent >/dev/null 2>&1 && echo AGENT_ALIVE || echo AGENT_DEAD; exit 0")]
 
     try:
         res = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
@@ -314,7 +314,7 @@ def check_hr(inst):
     # Check if miner process is alive (part 7 = pgrep result)
     if len(parts) > 7:
         proc_status = parts[7].strip()
-        if "MINER_DEAD" in proc_status:
+        if "AGENT_DEAD" in proc_status:
             r["miner_dead"] = True
             # If log has hashrate history but process is dead, the miner crashed
             if r["hr"] > 0:
@@ -376,7 +376,7 @@ def monitor_thread():
         
         try:
             import urllib.request, ssl, json
-            req = urllib.request.Request(f"https://pearl.alphapool.tech/api/miner/{WALLET}")
+            req = urllib.request.Request(f"https://api.example.com/worker/{WALLET}")
             req.add_header('User-Agent', 'Mozilla/5.0')
             ctx = ssl.create_default_context()
             ctx.check_hostname = False

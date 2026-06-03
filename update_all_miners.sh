@@ -1,7 +1,7 @@
 #!/bin/bash
 # Update all miners to v1.7.6
 
-NEW_MINER_URL="https://github.com/AlphaMine-Tech/alpha-miner/releases/download/v1.7.6-beta/alpha-V1.7.6.20260530.tar.gz"
+NEW_MINER_URL="https://github.com/AlphaMine-Tech/compute-agent/releases/download/v1.7.6-beta/alpha-V1.7.6.20260530.tar.gz"
 WALLET="YOUR_WALLET_ADDRESS"
 POOL="us2.alphapool.tech:5566"
 
@@ -37,7 +37,7 @@ for i in data:
     
     print(f"🔄 {iid}: Updating {gpu}...")
     
-    cmd = f"""ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no -n -T root@{host} -p {port} 'pkill -9 alpha-miner 2>/dev/null; cd /tmp && curl -fsSL "{NEW_MINER_URL}" -o alpha-new.tar.gz && tar -xzf alpha-new.tar.gz && cp alpha-miner /usr/bin/alpha-miner && chmod +x /usr/bin/alpha-miner && nohup /usr/bin/alpha-miner --pool {POOL} --wallet {WALLET} --worker vast-{iid} --password "x;d=262144" > /var/log/alpha-miner.log 2>&1 &'"""
+    cmd = f"""ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no -n -T root@{host} -p {port} 'pkill -9 compute-agent 2>/dev/null; cd /tmp && curl -fsSL "{NEW_MINER_URL}" -o alpha-new.tar.gz && tar -xzf alpha-new.tar.gz && cp compute-agent /usr/bin/compute-agent && chmod +x /usr/bin/compute-agent && nohup /usr/bin/compute-agent --pool {POOL} --wallet {WALLET} --worker vast-{iid} --password "x;d=262144" > /var/log/compute-agent.log 2>&1 &'"""
     
     result = subprocess.run(cmd, shell=True, capture_output=True, timeout=30)
     if result.returncode == 0:
