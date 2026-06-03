@@ -10,10 +10,10 @@ import subprocess
 import requests
 
 TG_BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"
-TG_CHAT_ID   = "-1002313274238"
+TG_CHAT_ID   = "YOUR_CHAT_ID"
 
-SERVER_1_IP = "206.189.232.0"  # Old Sniper
-SERVER_2_IP = "162.243.96.222" # New Sniper
+SERVER_1_IP = "YOUR_SERVER_1_IP"  # Old Sniper
+SERVER_2_IP = "YOUR_SERVER_2_IP" # New Sniper
 
 LINES = 12
 UPDATE_INTERVAL = 6.0

@@ -5,7 +5,7 @@ import requests
 from datetime import datetime
 
 BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"
-CHAT_ID = "-1004253884930"
+CHAT_ID = "YOUR_CHAT_ID"
 STATE_FILE = "tg_price_msg_id.txt"
 
 def get_safetrade_price():
@@ -27,9 +27,9 @@ def get_pearl_otc_price():
     headers = {
         "accept": "*/*",
         "accept-language": "en,en-US;q=0.9,ru-RU;q=0.8,ru;q=0.7",
-        "authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJ2ZXIiOjAsInNjb3BlIjoiYXV0aCIsInN1YiI6Ijg4MiIsImlhdCI6MTc4MDMwNzQ1MywiZXhwIjoxNzgwOTEyMjUzfQ.ndChfT0dwPLtQjhqVb8f4m3GV2_4IhVY8HcGHPG8Rk8",
+        "authorization": "Bearer YOUR_JWT_TOKEN",
         "cache-control": "no-cache",
-        "cookie": "_ga=GA1.2.510570945.1778501789; _ga_DHWFD0LYF7=GS2.2.s1780413237$o20$g1$t1780416439$j59$l0$h0; _ga_WPB73C2LN8=GS2.2.s1780415299$o12$g1$t1780416495$j59$l0$h0",
+        "cookie": "YOUR_COOKIE",
         "pragma": "no-cache",
         "priority": "u=1, i",
         "referer": "https://app.pearl-otc.com/",
