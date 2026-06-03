@@ -93,103 +93,13 @@ def global_log(bot_name, tag, msg, iid, mid, gpu, geo, dph):
             f.write(json.dumps(entry) + "\n")
     except: pass
 
-def do_destroy(iid):
-    try:
-        import urllib.request
-        req = urllib.request.Request(f"https://api.digitalocean.com/v2/droplets/{iid}", method="DELETE")
-        req.add_header("Authorization", "Bearer YOUR_DO_API_TOKEN")
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            return resp.status in (204, 200, 202)
-    except Exception:
-        return False
-
 def vast_destroy(iid):
-    if str(iid).startswith("574") or len(str(iid)) >= 9:
-        return do_destroy(iid)
     try:
         r = subprocess.run(["vastai","destroy","instance",str(iid)],
             input="y\n",capture_output=True,text=True,timeout=15)
         return "destroying" in r.stdout.lower()
     except Exception:
         return False
-
-_do_cache = []
-_last_do_fetch = 0.0
-
-def get_do_instances():
-    global _do_cache, _last_do_fetch
-    if time.time() - _last_do_fetch < 60:
-        return _do_cache
-    
-    try:
-        import urllib.request, json, ssl
-        ctx = ssl.create_default_context()
-        ctx.check_hostname = False
-        ctx.verify_mode = ssl.CERT_NONE
-        
-        do_keys = [
-            "YOUR_DO_API_TOKEN", # Старый аккаунт
-            "YOUR_DO_API_TOKEN"  # Новый аккаунт
-        ]
-        
-        all_do_insts = []
-        for key in do_keys:
-            try:
-                req = urllib.request.Request("https://api.digitalocean.com/v2/droplets?per_page=100")
-                req.add_header("Authorization", f"Bearer {key}")
-                with urllib.request.urlopen(req, timeout=10, context=ctx) as resp:
-                    data = json.loads(resp.read().decode())
-                
-                for d in data.get("droplets", []):
-                    if "gpu" not in d.get("tags", []): continue
-                    ip = ""
-                    for n in d.get("networks", {}).get("v4", []):
-                        if n.get("type") == "public": ip = n.get("ip_address")
-                    slug = d.get("size", {}).get("slug", "")
-                    parts = slug.split("-")
-                    if len(parts) >= 2 and "x" in parts[1]:
-                        gpu_info = parts[1].split("x")
-                        gpu_name = gpu_info[0].upper()
-                        if gpu_name == "H200": gpu_name = "H200 NVIDIA"
-                        elif gpu_name == "H100": gpu_name = "H100 NVIDIA"
-                        num_gpus = int(gpu_info[1])
-                    else:
-                        gpu_name = "Unknown"
-                        num_gpus = 1
-                        
-                    dph_raw = d.get("size", {}).get("price_hourly", 0.0)
-                    # Применяем реальную стоимость с учетом кредитов ($58 вложено на $200 кредитов = 29% от цены)
-                    dph = dph_raw * (58.0 / 200.0)
-                    created_at = d.get("created_at")
-                    start_date = 0.0
-                    if created_at:
-                        try: start_date = datetime.strptime(created_at, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc).timestamp()
-                        except: pass
-                        
-                    st = "running" if d.get("status") == "active" else "loading"
-                    
-                    all_do_insts.append({
-                        "id": d["id"],
-                        "machine_id": f"do-{d['id']}",
-                        "gpu_name": gpu_name,
-                        "num_gpus": num_gpus,
-                        "ssh_host": ip,
-                        "ssh_port": 22,
-                        "actual_status": st,
-                        "dph_total": dph,
-                        "start_date": start_date,
-                        "geolocation": d.get("region", {}).get("slug", "?"),
-                        "status_msg": "DigitalOcean",
-                        "is_do": True
-                    })
-            except Exception:
-                pass
-                
-        _last_do_fetch = time.time()
-        _do_cache = all_do_insts
-        return all_do_insts
-    except Exception as e:
-        return _do_cache
 
 def get_instances():
     try:
@@ -199,8 +109,6 @@ def get_instances():
         vast_insts = data.get("instances", []) if isinstance(data, dict) else (data if isinstance(data, list) else [])
     except Exception as e:
         vast_insts = []
-    
-    vast_insts.extend(get_do_instances())
     return vast_insts
 
 
