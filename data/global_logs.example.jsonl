@@ -1,0 +1,2 @@
+{"time": "05-23 15:42:10", "bot": "WATCHDOG", "tag": "KILL_HR", "msg": "Underperforming (Hashrate: 65 < 120)", "iid": "12345678", "mid": "987654", "gpu": "RTX 4080", "geo": "US", "dph": 0.29}
+{"time": "05-23 16:15:30", "bot": "AUTOBUY", "tag": "RENTED", "msg": "Successfully rented server", "iid": "12345679", "mid": "987655", "gpu": "RTX 5090", "geo": "CA", "dph": 0.85}
